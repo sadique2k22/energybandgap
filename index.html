@@ -47,7 +47,7 @@
 
 <div class="container">
 
-    <h1>Determination of Energy Band Gap</h1>
+    <h1>Determination of Energy Band Gap in a Semiconductor using a PN Junction Diode</h1>
     
     <div class="btn-container">
         <button class="magic-btn" onclick="fillAccurateData()">✨ Auto-Fill Accurate Data (Ge)</button>
@@ -66,6 +66,66 @@
         <br>
         $$ \Delta E = \frac{\text{slope}}{5.036} \text{ eV} $$
     </div>
+
+    <!-- NEW: THEORY -->
+    <h2>Theory</h2>
+    <p>
+        A semiconductor has two principal energy bands: the valence band (occupied by electrons bound to atoms)
+        and the conduction band (where electrons are free to conduct). The energy difference between these bands
+        is called the <strong>energy band gap</strong>, \(\Delta E\). At higher temperatures, thermal excitation
+        allows more charge carriers to cross the gap, increasing conductivity.
+    </p>
+    <p>
+        In a PN junction under reverse bias, the observed current is the reverse saturation current \(I_s\), which
+        is dominated by minority carriers. This current depends strongly on temperature and on the band gap as:
+        \[
+            I_s \propto \exp\!\left(-\frac{\Delta E}{2kT}\right).
+        \]
+        Taking logarithms produces a linear relation between \(\log I_s\) and \(1/T\), enabling experimental
+        determination of \(\Delta E\) from the slope.
+    </p>
+
+    <!-- NEW: DERIVATION -->
+    <h2>Derivation of Formula</h2>
+    <p>
+        Starting from the temperature dependence:
+        \[
+            I_s \propto \exp\!\left(-\frac{\Delta E}{2kT}\right),
+        \]
+        where \(k\) is Boltzmann's constant. Taking base-10 logarithm:
+        \[
+            \log_{10} I_s = \log_{10} I_0 - \frac{\Delta E}{2k \ln 10}\cdot\frac{1}{T}.
+        \]
+        Converting constants to convenient units yields the empirically used form:
+        \[
+            \log I_s = \text{constant} - 5.036\,\Delta E \left(\frac{10^3}{T}\right).
+        \]
+        Therefore the slope \(m\) of a plot of \(\log I_s\) (y-axis) vs \(10^3/T\) (x-axis) equals \(5.036\,\Delta E\).
+        Rearranging,
+        \[
+            \Delta E = \frac{m}{5.036}\ \text{eV}.
+        \]
+    </p>
+
+    <!-- NEW: PROCEDURE -->
+    <h2>Procedure</h2>
+    <ol>
+        <li>Assemble the circuit in reverse bias as shown in Fig. 1: diode connected to a fixed 3 V supply and micro-ammeter in series.</li>
+        <li>Place the diode carefully inside the oven groove and fix the thermometer close to the diode so it measures the diode temperature.</li>
+        <li>Switch on the oven and allow the temperature to rise to about 65°C. The temperature may reach ≈70°C and stabilize; then switch off the oven.</li>
+        <li>Allow the temperature to fall slowly. When the temperature decreases, measure the reverse saturation current \(I_s\) at regular intervals (for example every 1–2°C or every 5 μA change in current).</li>
+        <li>Record the temperature in °C and the corresponding current \(I_s\) (in μA) for at least 6–8 readings across the temperature range.</li>
+        <li>Convert temperatures to Kelvin: \(T(\text{K}) = T(°\text{C}) + 273.15\).</li>
+        <li>Compute \(10^3/T\) for each temperature and \(\log_{10} I_s\) for each current.</li>
+        <li>Plot \(\log I_s\) (y-axis) versus \(10^3/T\) (x-axis). Fit a straight line and obtain its slope \(m\).</li>
+        <li>Calculate \(\Delta E = m/5.036\) (in eV) and compare with the standard value (Ge ≈ 0.7 eV).</li>
+    </ol>
+
+    <!-- NEW: OBSERVATIONS -->
+    <h2>Observations</h2>
+    <p>Least count of thermometer: <strong>  35° C  </strong></p>
+    <p>Least count of micro-ammeter: <strong>  2 µA  </strong></p>
+    <p><em>Record measured values in Table 1 below.</em></p>
 
     <h2>Figure 1</h2>
     <div class="img-container">
