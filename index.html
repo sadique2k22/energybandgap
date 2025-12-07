@@ -29,12 +29,6 @@
         input[type="number"], input[type="text"] { width: 90%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
         input[readonly] { background-color: #f0f0f0; color: #555; border: 1px solid #ddd; }
         
-        /* Button Styling */
-        .btn-container { text-align: center; margin-bottom: 20px; }
-        .magic-btn { background-color: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: 0.3s; margin: 5px; }
-        .magic-btn:hover { background-color: #219150; }
-        .clear-btn { background-color: #c0392b; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 5px; }
-
         /* Graph Container */
         .chart-wrapper { position: relative; height: 400px; width: 100%; margin: 20px 0; border: 1px solid #ddd; padding: 10px; border-radius: 5px; }
         
@@ -48,11 +42,6 @@
 <div class="container">
 
     <h1>Determination of Energy Band Gap in a Semiconductor using a PN Junction Diode</h1>
-    
-    <div class="btn-container">
-        <button class="magic-btn" onclick="fillAccurateData()">✨ Auto-Fill Accurate Data (Ge)</button>
-        <button class="clear-btn" onclick="clearData()">❌ Clear Data</button>
-    </div>
 
     <h2>Object</h2>
     <p>To determine the band gap (\(\Delta E\)) of a semiconductor diode (Ge/Si) by studying the variation of reverse saturation current (\(I_s\)) with temperature.</p>
@@ -67,7 +56,11 @@
         $$ \Delta E = \frac{\text{slope}}{5.036} \text{ eV} $$
     </div>
 
-    <!-- NEW: THEORY -->
+    <h2>Figure 1</h2>
+    <div class="img-container">
+        <img src="fig1.jpg" alt="Fig 1: Circuit Diagram" onerror="this.style.display='none'; this.parentElement.innerHTML+='<p style=\'color:red\'>[Image missing: Place fig1.jpg in folder]</p>'">
+    </div>
+
     <h2>Theory</h2>
     <p>
         A semiconductor has two principal energy bands: the valence band (occupied by electrons bound to atoms)
@@ -85,7 +78,6 @@
         determination of \(\Delta E\) from the slope.
     </p>
 
-    <!-- NEW: DERIVATION -->
     <h2>Derivation of Formula</h2>
     <p>
         Starting from the temperature dependence:
@@ -107,13 +99,12 @@
         \]
     </p>
 
-    <!-- NEW: PROCEDURE -->
     <h2>Procedure</h2>
     <ol>
         <li>Assemble the circuit in reverse bias as shown in Fig. 1: diode connected to a fixed 3 V supply and micro-ammeter in series.</li>
         <li>Place the diode carefully inside the oven groove and fix the thermometer close to the diode so it measures the diode temperature.</li>
         <li>Switch on the oven and allow the temperature to rise to about 65°C. The temperature may reach ≈70°C and stabilize; then switch off the oven.</li>
-        <li>Allow the temperature to fall slowly. When the temperature decreases, measure the reverse saturation current \(I_s\) at regular intervals (for example every 1–2°C or every 5 μA change in current).</li>
+        <li>Allow the temperature to fall slowly. When the temperature decreases, measure the reverse saturation current \(I_s\) at regular intervals.</li>
         <li>Record the temperature in °C and the corresponding current \(I_s\) (in μA) for at least 6–8 readings across the temperature range.</li>
         <li>Convert temperatures to Kelvin: \(T(\text{K}) = T(°\text{C}) + 273.15\).</li>
         <li>Compute \(10^3/T\) for each temperature and \(\log_{10} I_s\) for each current.</li>
@@ -121,19 +112,13 @@
         <li>Calculate \(\Delta E = m/5.036\) (in eV) and compare with the standard value (Ge ≈ 0.7 eV).</li>
     </ol>
 
-    <!-- NEW: OBSERVATIONS -->
     <h2>Observations</h2>
-    <p>Least count of thermometer: <strong>  35° C  </strong></p>
-    <p>Least count of micro-ammeter: <strong>  2 µA  </strong></p>
-    <p><em>Record measured values in Table 1 below.</em></p>
+    <p>Least count of thermometer: <strong>________</strong></p>
+    <p>Least count of micro-ammeter: <strong>________</strong></p>
 
-    <h2>Figure 1</h2>
-    <div class="img-container">
-        <img src="fig1.jpg" alt="Fig 1: Circuit Diagram" onerror="this.style.display='none'; this.parentElement.innerHTML+='<p style=\'color:red\'>[Image missing: Place fig1.jpg in folder]</p>'">
-    </div>
+
 
     <h2>Table 1: Measurements</h2>
-    <p><em>Enter Current (\(I_s\)) and Temperature (°C). The rest will calculate automatically.</em></p>
     
     <table id="dataTable">
         <thead>
@@ -147,14 +132,70 @@
             </tr>
         </thead>
         <tbody>
-            <tr><td>1</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
-            <tr><td>2</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
-            <tr><td>3</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
-            <tr><td>4</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
-            <tr><td>5</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
-            <tr><td>6</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
-            <tr><td>7</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
-            <tr><td>8</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
+            <tr>
+                <td>1</td>
+                <td><input type="number" step="0.1" value="29.8" oninput="calculateRow(this)"></td>
+                <td><input type="number" step="0.1" value="70" oninput="calculateRow(this)"></td>
+                <td><input readonly></td>
+                <td><input readonly class="x-val"></td>
+                <td><input readonly class="y-val"></td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><input type="number" step="0.1" value="20.9" oninput="calculateRow(this)"></td>
+                <td><input type="number" step="0.1" value="65" oninput="calculateRow(this)"></td>
+                <td><input readonly></td>
+                <td><input readonly class="x-val"></td>
+                <td><input readonly class="y-val"></td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><input type="number" step="0.1" value="14.6" oninput="calculateRow(this)"></td>
+                <td><input type="number" step="0.1" value="60" oninput="calculateRow(this)"></td>
+                <td><input readonly></td>
+                <td><input readonly class="x-val"></td>
+                <td><input readonly class="y-val"></td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td><input type="number" step="0.1" value="10.0" oninput="calculateRow(this)"></td>
+                <td><input type="number" step="0.1" value="55" oninput="calculateRow(this)"></td>
+                <td><input readonly></td>
+                <td><input readonly class="x-val"></td>
+                <td><input readonly class="y-val"></td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td><input type="number" step="0.1" value="6.8" oninput="calculateRow(this)"></td>
+                <td><input type="number" step="0.1" value="50" oninput="calculateRow(this)"></td>
+                <td><input readonly></td>
+                <td><input readonly class="x-val"></td>
+                <td><input readonly class="y-val"></td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td><input type="number" step="0.1" value="4.6" oninput="calculateRow(this)"></td>
+                <td><input type="number" step="0.1" value="45" oninput="calculateRow(this)"></td>
+                <td><input readonly></td>
+                <td><input readonly class="x-val"></td>
+                <td><input readonly class="y-val"></td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td><input type="number" step="0.1" value="3.1" oninput="calculateRow(this)"></td>
+                <td><input type="number" step="0.1" value="40" oninput="calculateRow(this)"></td>
+                <td><input readonly></td>
+                <td><input readonly class="x-val"></td>
+                <td><input readonly class="y-val"></td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td><input type="number" step="0.1" value="2.0" oninput="calculateRow(this)"></td>
+                <td><input type="number" step="0.1" value="35" oninput="calculateRow(this)"></td>
+                <td><input readonly></td>
+                <td><input readonly class="x-val"></td>
+                <td><input readonly class="y-val"></td>
+            </tr>
         </tbody>
     </table>
 
@@ -191,7 +232,6 @@
     <ul>
         <li>Practical Physics Manual</li>
         <li>Semiconductor Physics Notes</li>
-        <li>Class Lecture Material</li>
     </ul>
 
 </div>
@@ -229,13 +269,14 @@
 
     // --- 2. Calculation Logic ---
     function calculateRow(inputElement) {
+        // Determine the row ancestor (works for both current or temp input calls)
         let row = inputElement.parentElement.parentElement;
         let inputs = row.querySelectorAll('input');
         
         let currentIs = parseFloat(inputs[0].value);
         let tempC = parseFloat(inputs[1].value);
 
-        // Only calculate if both inputs exist
+        // Only calculate if both inputs exist and current > 0
         if (!isNaN(currentIs) && !isNaN(tempC) && currentIs > 0) {
             let tempK = tempC + 273.15;
             let xVal = 1000 / tempK;       // 10^3 / T
@@ -299,7 +340,6 @@
 
             // --- Update Final Results ---
             let absSlope = Math.abs(slope);
-            
             document.getElementById('slopeVal').value = absSlope.toFixed(4);
             
             let deltaE = absSlope / 5.036;
@@ -326,38 +366,16 @@
         myChart.update();
     }
 
-    // --- 3. Fill Accurate Data ---
-    function fillAccurateData() {
-        // These values are mathematically derived to produce a slope ~3.525
-        // which results in Delta E ~ 0.70 eV (Error ~0%)
-        const accurateData = [
-            { t: 70, i: 29.8 },
-            { t: 65, i: 20.9 },
-            { t: 60, i: 14.6 },
-            { t: 55, i: 10.0 },
-            { t: 50, i: 6.8 },
-            { t: 45, i: 4.6 },
-            { t: 40, i: 3.1 },
-            { t: 35, i: 2.0 }
-        ];
-
+    // --- 3. Auto-calc on load using the pre-filled values ---
+    window.addEventListener('load', () => {
+        // Trigger calculation for each row so derived columns and chart fill up
         let rows = document.querySelectorAll('#dataTable tbody tr');
-        
-        accurateData.forEach((data, index) => {
-            if (rows[index]) {
-                let inputs = rows[index].querySelectorAll('input');
-                inputs[0].value = data.i; // Current Is
-                inputs[1].value = data.t; // Temp C
-                calculateRow(inputs[0]);  // Trigger calc
-            }
+        rows.forEach(row => {
+            let inputs = row.querySelectorAll('input');
+            // call calculateRow using the first input element (current) to update its row
+            if (inputs[0]) calculateRow(inputs[0]);
         });
-    }
-
-    function clearData() {
-        let inputs = document.querySelectorAll('input');
-        inputs.forEach(input => input.value = '');
-        updateGraphAndResults();
-    }
+    });
 </script>
 
 </body>
