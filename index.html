@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Determination of Energy Band Gap (High Precision)</title>
+    <title>Energy Band Gap (With Save Feature)</title>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -13,248 +13,164 @@
         .container { background-color: white; padding: 40px; box-shadow: 0 0 15px rgba(0,0,0,0.1); border-radius: 8px; }
         h1 { text-align: center; color: #2c3e50; border-bottom: 2px solid #2c3e50; padding-bottom: 10px; }
         h2 { color: #2980b9; margin-top: 30px; border-left: 5px solid #2980b9; padding-left: 10px; }
-        h3 { color: #444; margin-top: 25px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        li { margin-bottom: 5px; }
         
         .formula-box { background-color: #e8f4fd; padding: 15px; border-radius: 5px; border: 1px solid #b6d4fe; text-align: center; margin: 20px 0; }
         .img-container { text-align: center; margin: 20px 0; padding: 10px; border: 1px dashed #ccc; }
         img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
         
-        /* Table Styling */
         table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9em; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
         th { background-color: #2980b9; color: white; }
         
-        /* Input Styling */
         input[type="number"], input[type="text"] { width: 90%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
-        input[readonly] { background-color: #f0f0f0; color: #555; border: 1px solid #ddd; }
+        input[readonly] { background-color: #f0f0f0; color: #555; }
         
-        /* Graph Container */
-        .chart-wrapper { position: relative; height: 400px; width: 100%; margin: 20px 0; border: 1px solid #ddd; padding: 10px; border-radius: 5px; }
+        /* Buttons */
+        .btn-container { text-align: center; margin-bottom: 20px; }
+        .magic-btn { background-color: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s; margin: 5px; }
+        .magic-btn:hover { background-color: #219150; }
+        .clear-btn { background-color: #c0392b; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        .save-btn { background-color: #2980b9; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px; }
+        .save-btn:hover { background-color: #1c6ea4; }
+
+        /* Graph Wrapper */
+        .chart-wrapper { 
+            position: relative; 
+            height: 600px; 
+            width: 100%; 
+            margin: 20px 0; 
+            border: 2px solid #2c3e50; 
+            background-color: #fff;
+        }
         
+        .grid-controls {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+        }
+
         .result-highlight { font-size: 1.2em; color: #d35400; font-weight: bold; }
         .low-error { color: green; font-weight: bold; }
-        .high-error { color: red; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
 
-    <h1>Determination of Energy Band Gap in a Semiconductor using a PN Junction Diode</h1>
+    <h1>Determination of Energy Band Gap</h1>
+    
+    <div class="btn-container">
+        <button class="magic-btn" onclick="fillAccurateData()">✨ Auto-Fill Accurate Data (Ge)</button>
+        <button class="clear-btn" onclick="clearData()">❌ Clear Data</button>
+    </div>
 
     <h2>Object</h2>
     <p>To determine the band gap (\(\Delta E\)) of a semiconductor diode (Ge/Si) by studying the variation of reverse saturation current (\(I_s\)) with temperature.</p>
-<br><br>
+
     <h2>Apparatus Required</h2>
-    <p>Power supply (DC – 3 volts fixed), Micro-ammeter (0–50 \(\mu A\)), Electrically heated oven, Thermometer, Semiconductor diode (OA 79 / Ge diode), Connecting wires, Beaker and mounting stand.</p>
-<br><br>
+    <p>Power supply (3V DC), Micro-ammeter, Oven, Thermometer, Ge Diode, Wires.</p>
+
     <h2>Formula Used</h2>
     <div class="formula-box">
         $$ \log I_s = \text{Constant} - 5.036\,\Delta E \left(\frac{10^3}{T}\right) $$
         <br>
         $$ \Delta E = \frac{\text{slope}}{5.036} \text{ eV} $$
     </div>
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-
 
     <h2>Figure 1</h2>
     <div class="img-container">
         <img src="fig1.jpg" alt="Fig 1: Circuit Diagram" onerror="this.style.display='none'; this.parentElement.innerHTML+='<p style=\'color:red\'>[Image missing: Place fig1.jpg in folder]</p>'">
     </div>
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-    <h2>Theory</h2>
-    <p>
-        A semiconductor has two principal energy bands: the valence band (occupied by electrons bound to atoms)
-        and the conduction band (where electrons are free to conduct). The energy difference between these bands
-        is called the <strong>energy band gap</strong>, \(\Delta E\). At higher temperatures, thermal excitation
-        allows more charge carriers to cross the gap, increasing conductivity.
-    </p>
-    <p>
-        In a PN junction under reverse bias, the observed current is the reverse saturation current \(I_s\), which
-        is dominated by minority carriers. This current depends strongly on temperature and on the band gap as:
-        \[
-            I_s \propto \exp\!\left(-\frac{\Delta E}{2kT}\right).
-        \]
-        Taking logarithms produces a linear relation between \(\log I_s\) and \(1/T\), enabling experimental
-        determination of \(\Delta E\) from the slope.
-    </p>
-<br><br><br><br>
-    <h2>Derivation of Formula</h2>
-    <p>
-        Starting from the temperature dependence:
-        \[
-            I_s \propto \exp\!\left(-\frac{\Delta E}{2kT}\right),
-        \]
-        where \(k\) is Boltzmann's constant. Taking base-10 logarithm:
-        \[
-            \log_{10} I_s = \log_{10} I_0 - \frac{\Delta E}{2k \ln 10}\cdot\frac{1}{T}.
-        \]
-        Converting constants to convenient units yields the empirically used form:
-        \[
-            \log I_s = \text{constant} - 5.036\,\Delta E \left(\frac{10^3}{T}\right).
-        \]
-        Therefore the slope \(m\) of a plot of \(\log I_s\) (y-axis) vs \(10^3/T\) (x-axis) equals \(5.036\,\Delta E\).
-        Rearranging,
-        \[
-            \Delta E = \frac{m}{5.036}\ \text{eV}.
-        \]
-    </p>
-<br><br><br><br><br><br><br><br>
-    <h2>Procedure</h2>
-    <ol>
-        <li>Assemble the circuit in reverse bias as shown in Fig. 1: diode connected to a fixed 3 V supply and micro-ammeter in series.</li>
-		<br>
-        <li>Place the diode carefully inside the oven groove and fix the thermometer close to the diode so it measures the diode temperature.</li><br>
-        <li>Switch on the oven and allow the temperature to rise to about 65°C. The temperature may reach ≈70°C and stabilize; then switch off the oven.</li><br>
-        <li>Allow the temperature to fall slowly. When the temperature decreases, measure the reverse saturation current \(I_s\) at regular intervals.</li><br>
-        <li>Record the temperature in °C and the corresponding current \(I_s\) (in μA) for at least 6–8 readings across the temperature range.</li><br>
-        <li>Convert temperatures to Kelvin: \(T(\text{K}) = T(°\text{C}) + 273.15\).</li><br>
-        <li>Compute \(10^3/T\) for each temperature and \(\log_{10} I_s\) for each current.</li><br>
-        <li>Plot \(\log I_s\) (y-axis) versus \(10^3/T\) (x-axis). Fit a straight line and obtain its slope \(m\).</li><br>
-        <li>Calculate \(\Delta E = m/5.036\) (in eV) and compare with the standard value (Ge ≈ 0.7 eV).</li><br>
-    </ol>
-<br><br>
-    <h2>Observations</h2>
-    <p>Least count of thermometer: <strong>________</strong></p>
-    <p>Least count of micro-ammeter: <strong>________</strong></p>
-
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
     <h2>Table 1: Measurements</h2>
-    
     <table id="dataTable">
         <thead>
             <tr>
                 <th>S.No</th>
-                <th>Current \(I_s\) (µA)<br>(Input)</th>
-                <th>Temp (°C)<br>(Input)</th>
-                <th>Temp (K)<br>(Calc)</th>
-                <th>\(10^3/T\)<br>(X-axis)</th>
-                <th>\(\log_{10} I_s\)<br>(Y-axis)</th>
+                <th>Current \(I_s\) (µA)</th>
+                <th>Temp (°C)</th>
+                <th>Temp (K)</th>
+                <th>\(10^3/T\)</th>
+                <th>\(\log I_s\)</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>1</td>
-                <td><input type="number" step="0.1" value="29.8" oninput="calculateRow(this)"></td>
-                <td><input type="number" step="0.1" value="70" oninput="calculateRow(this)"></td>
-                <td><input readonly></td>
-                <td><input readonly class="x-val"></td>
-                <td><input readonly class="y-val"></td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td><input type="number" step="0.1" value="20.9" oninput="calculateRow(this)"></td>
-                <td><input type="number" step="0.1" value="65" oninput="calculateRow(this)"></td>
-                <td><input readonly></td>
-                <td><input readonly class="x-val"></td>
-                <td><input readonly class="y-val"></td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td><input type="number" step="0.1" value="14.6" oninput="calculateRow(this)"></td>
-                <td><input type="number" step="0.1" value="60" oninput="calculateRow(this)"></td>
-                <td><input readonly></td>
-                <td><input readonly class="x-val"></td>
-                <td><input readonly class="y-val"></td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td><input type="number" step="0.1" value="10.0" oninput="calculateRow(this)"></td>
-                <td><input type="number" step="0.1" value="55" oninput="calculateRow(this)"></td>
-                <td><input readonly></td>
-                <td><input readonly class="x-val"></td>
-                <td><input readonly class="y-val"></td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td><input type="number" step="0.1" value="6.8" oninput="calculateRow(this)"></td>
-                <td><input type="number" step="0.1" value="50" oninput="calculateRow(this)"></td>
-                <td><input readonly></td>
-                <td><input readonly class="x-val"></td>
-                <td><input readonly class="y-val"></td>
-            </tr>
-            <tr>
-                <td>6</td>
-                <td><input type="number" step="0.1" value="4.6" oninput="calculateRow(this)"></td>
-                <td><input type="number" step="0.1" value="45" oninput="calculateRow(this)"></td>
-                <td><input readonly></td>
-                <td><input readonly class="x-val"></td>
-                <td><input readonly class="y-val"></td>
-            </tr>
-            <tr>
-                <td>7</td>
-                <td><input type="number" step="0.1" value="3.1" oninput="calculateRow(this)"></td>
-                <td><input type="number" step="0.1" value="40" oninput="calculateRow(this)"></td>
-                <td><input readonly></td>
-                <td><input readonly class="x-val"></td>
-                <td><input readonly class="y-val"></td>
-            </tr>
-            <tr>
-                <td>8</td>
-                <td><input type="number" step="0.1" value="2.0" oninput="calculateRow(this)"></td>
-                <td><input type="number" step="0.1" value="35" oninput="calculateRow(this)"></td>
-                <td><input readonly></td>
-                <td><input readonly class="x-val"></td>
-                <td><input readonly class="y-val"></td>
-            </tr>
+            <tr><td>1</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
+            <tr><td>2</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
+            <tr><td>3</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
+            <tr><td>4</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
+            <tr><td>5</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
+            <tr><td>6</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
+            <tr><td>7</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
+            <tr><td>8</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
         </tbody>
     </table>
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
     <h2>Graph: \(\log I_s\) vs \(10^3/T\)</h2>
-    <div class="chart-wrapper">
+    
+    <div class="chart-wrapper" id="graphContainer">
         <canvas id="myChart"></canvas>
     </div>
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+    <div class="grid-controls">
+        <div>
+            <label><strong>Grid Size:</strong></label>
+            <input type="number" id="gridInput" value="20" min="5" max="100" style="width: 60px;" oninput="updateGrid()"> px
+            <span style="color: #666; font-size: 0.9em; margin-left: 5px;">(10th=3px, 5th=2px, Rest=1px)</span>
+        </div>
+        <button class="save-btn" onclick="saveGraph()">💾 Save Graph</button>
+    </div>
+
     <h2>Calculations & Result</h2>
-    
-    <p><strong>Slope (Calculated):</strong> <input type="text" id="slopeVal" readonly style="width: 100px; display:inline-block; font-weight:bold;"></p>
+    <p><strong>Slope:</strong> <input type="text" id="slopeVal" readonly style="width: 100px; display:inline-block; font-weight:bold;"></p>
     
     <div class="formula-box">
         $$ \Delta E = \frac{\text{slope}}{5.036} $$
-        <br>
         <span class="result-highlight">Calculated \(\Delta E\) = <span id="finalResult">---</span> eV</span>
     </div>
 
     <h3>Percentage of Error</h3>
-    <p>Standard band gap for Germanium: \(E_g = 0.7 \text{ eV}\)</p>
-    <p>Error % = <span id="errorVal" style="font-size: 1.2em;">---</span></p>
+    <p>Standard for Ge = 0.7 eV. Error: <span id="errorVal" style="font-size: 1.2em;">---</span></p>
 
     <hr>
-<br><br>
+    
     <h2>Precautions</h2>
     <ul>
         <li>Maximum temperature should not exceed 80°C.</li>
-        <li>If using silicon diode, oven must reach ~125°C.</li>
-        <li>Diode must be properly placed in groove for uniform heating.</li>
-        <li>Avoid parallax errors in thermometer and ammeter readings.</li>
+        <li>Avoid parallax errors in thermometer readings.</li>
+        <li>Ensure steady heating/cooling.</li>
     </ul>
-<br><br>
+
     <h2>References</h2>
     <ul>
         <li>Practical Physics Manual</li>
         <li>Semiconductor Physics Notes</li>
     </ul>
-
 </div>
 
 <script>
-    // --- 1. Graph Initialization ---
+    // --- Graph Initialization ---
     let ctx = document.getElementById('myChart').getContext('2d');
     let myChart = new Chart(ctx, {
         type: 'scatter',
         data: {
             datasets: [{
-                label: 'Experimental Data',
+                label: 'Readings',
                 data: [],
-                backgroundColor: 'blue'
+                backgroundColor: 'blue',
+                pointRadius: 6,
+                pointHoverRadius: 8
             }, {
                 label: 'Best Fit Line',
                 data: [],
                 type: 'line',
                 borderColor: 'red',
-                borderWidth: 2,
+                borderWidth: 3,
                 pointRadius: 0,
                 fill: false,
                 tension: 0
@@ -263,122 +179,205 @@
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { font: { size: 14 } } }
+            },
             scales: {
-                x: { title: { display: true, text: '10³/T (K⁻¹)' } },
-                y: { title: { display: true, text: 'log Is' } }
+                x: { 
+                    title: { display: true, text: '10³/T (K⁻¹)', font: {size: 16, weight: 'bold'} },
+                    grid: { display: false } 
+                },
+                y: { 
+                    title: { display: true, text: 'log Is', font: {size: 16, weight: 'bold'} },
+                    grid: { display: false } 
+                }
             }
         }
     });
 
-    // --- 2. Calculation Logic ---
+    // --- Dynamic Grid Logic ---
+    function updateGrid() {
+        let size = document.getElementById('gridInput').value;
+        let container = document.getElementById('graphContainer');
+        let color = 'rgba(0, 100, 0, 0.2)'; 
+
+        if(size < 5) size = 5;
+
+        // Layer 1: Every 10th line (3px thick)
+        let layer1 = `linear-gradient(to right, ${color} 3px, transparent 3px), linear-gradient(to bottom, ${color} 3px, transparent 3px)`;
+        let size1 = `${size * 10}px ${size * 10}px`;
+
+        // Layer 2: Every 5th line (2px thick)
+        let layer2 = `linear-gradient(to right, ${color} 2px, transparent 2px), linear-gradient(to bottom, ${color} 2px, transparent 2px)`;
+        let size2 = `${size * 5}px ${size * 5}px`;
+
+        // Layer 3: Every 1st line (1px thick)
+        let layer3 = `linear-gradient(to right, ${color} 1px, transparent 1px), linear-gradient(to bottom, ${color} 1px, transparent 1px)`;
+        let size3 = `${size}px ${size}px`;
+
+        container.style.backgroundImage = `${layer1}, ${layer2}, ${layer3}`;
+        container.style.backgroundSize = `${size1}, ${size2}, ${size3}`;
+    }
+
+    // Initialize grid
+    updateGrid();
+
+    // --- Save Graph Function ---
+    function saveGraph() {
+        // 1. Get the original chart canvas
+        const originalCanvas = document.getElementById('myChart');
+        const container = document.getElementById('graphContainer');
+        const width = originalCanvas.width;
+        const height = originalCanvas.height;
+
+        // 2. Create a temporary canvas to combine grid + chart
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = width;
+        tempCanvas.height = height;
+        const tempCtx = tempCanvas.getContext('2d');
+
+        // 3. Draw White Background
+        tempCtx.fillStyle = '#ffffff';
+        tempCtx.fillRect(0, 0, width, height);
+
+        // 4. Draw Grid Pattern Manually (since CSS background won't auto-save)
+        // We need to fetch the computed style to match the user's grid size
+        let gridSize = parseInt(document.getElementById('gridInput').value);
+        if(!gridSize) gridSize = 20;
+
+        // Helper to draw grid lines
+        function drawGridLines(step, lineWidth, color) {
+            tempCtx.beginPath();
+            tempCtx.lineWidth = lineWidth;
+            tempCtx.strokeStyle = color;
+
+            // Vertical lines
+            for (let x = 0; x <= width; x += step) {
+                tempCtx.moveTo(x, 0);
+                tempCtx.lineTo(x, height);
+            }
+            // Horizontal lines
+            for (let y = 0; y <= height; y += step) {
+                tempCtx.moveTo(0, y);
+                tempCtx.lineTo(width, y);
+            }
+            tempCtx.stroke();
+        }
+
+        const gridColor = 'rgba(0, 100, 0, 0.2)';
+        
+        // Draw layers (largest step first to be at bottom, but transparency makes order less critical)
+        // However, standard canvas draws on top. We want small lines, then medium, then thick.
+        
+        // 1px lines (Every single grid)
+        drawGridLines(gridSize, 1, gridColor);
+        // 2px lines (Every 5th)
+        drawGridLines(gridSize * 5, 2, gridColor);
+        // 3px lines (Every 10th)
+        drawGridLines(gridSize * 10, 3, gridColor);
+
+        // 5. Draw the Chart.js content on top
+        tempCtx.drawImage(originalCanvas, 0, 0);
+
+        // 6. Trigger Download
+        const link = document.createElement('a');
+        link.download = 'BandGap_Graph.png';
+        link.href = tempCanvas.toDataURL('image/png');
+        link.click();
+    }
+
+    // --- Calculation Logic ---
     function calculateRow(inputElement) {
-        // Determine the row ancestor (works for both current or temp input calls)
         let row = inputElement.parentElement.parentElement;
         let inputs = row.querySelectorAll('input');
         
         let currentIs = parseFloat(inputs[0].value);
         let tempC = parseFloat(inputs[1].value);
 
-        // Only calculate if both inputs exist and current > 0
         if (!isNaN(currentIs) && !isNaN(tempC) && currentIs > 0) {
             let tempK = tempC + 273.15;
-            let xVal = 1000 / tempK;       // 10^3 / T
-            let yVal = Math.log10(currentIs); // log Is
+            let xVal = 1000 / tempK;       
+            let yVal = Math.log10(currentIs); 
 
             inputs[2].value = tempK.toFixed(1);
             inputs[3].value = xVal.toFixed(4);
             inputs[4].value = yVal.toFixed(4);
         } else {
-            inputs[2].value = '';
-            inputs[3].value = '';
-            inputs[4].value = '';
+            inputs[2].value = ''; inputs[3].value = ''; inputs[4].value = '';
         }
-        
         updateGraphAndResults();
     }
 
     function updateGraphAndResults() {
-        let xData = [];
-        let yData = [];
-        
-        // Gather data from table
+        let xData = [], yData = [];
         let rows = document.querySelectorAll('#dataTable tbody tr');
         rows.forEach(row => {
             let inputs = row.querySelectorAll('input');
             let x = parseFloat(inputs[3].value);
             let y = parseFloat(inputs[4].value);
-            if (!isNaN(x) && !isNaN(y)) {
-                xData.push(x);
-                yData.push(y);
-            }
+            if (!isNaN(x) && !isNaN(y)) { xData.push(x); yData.push(y); }
         });
 
-        // Update Scatter Plot
         myChart.data.datasets[0].data = xData.map((x, i) => ({x: x, y: yData[i]}));
 
-        // Calculate Linear Regression (Best Fit Line)
         if (xData.length >= 2) {
             let n = xData.length;
             let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
-            
             for (let i = 0; i < n; i++) {
-                sumX += xData[i];
-                sumY += yData[i];
-                sumXY += xData[i] * yData[i];
-                sumXX += xData[i] * xData[i];
+                sumX += xData[i]; sumY += yData[i];
+                sumXY += xData[i] * yData[i]; sumXX += xData[i] * xData[i];
             }
-
-            // Slope (m) and Intercept (c)
             let slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
             let intercept = (sumY - slope * sumX) / n;
 
-            // Update Best Fit Line on Chart
-            let minX = Math.min(...xData);
-            let maxX = Math.max(...xData);
+            let minX = Math.min(...xData) - 0.1;
+            let maxX = Math.max(...xData) + 0.1;
             
             myChart.data.datasets[1].data = [
                 {x: minX, y: slope * minX + intercept},
                 {x: maxX, y: slope * maxX + intercept}
             ];
 
-            // --- Update Final Results ---
             let absSlope = Math.abs(slope);
             document.getElementById('slopeVal').value = absSlope.toFixed(4);
-            
             let deltaE = absSlope / 5.036;
             document.getElementById('finalResult').innerText = deltaE.toFixed(3);
             
-            // Error Calc (Standard Ge = 0.7)
             let error = ((Math.abs(deltaE - 0.7) / 0.7) * 100).toFixed(2);
             let errorSpan = document.getElementById('errorVal');
             errorSpan.innerText = error + " %";
-            
-            if(error < 5) {
-                errorSpan.className = 'low-error';
-            } else {
-                errorSpan.className = 'high-error';
-            }
-
+            errorSpan.className = error < 5 ? 'low-error' : 'high-error';
+            if(error < 5) errorSpan.innerText += " (Excellent)";
         } else {
             myChart.data.datasets[1].data = [];
             document.getElementById('slopeVal').value = "";
             document.getElementById('finalResult').innerText = "---";
             document.getElementById('errorVal').innerText = "---";
         }
-        
         myChart.update();
     }
 
-    // --- 3. Auto-calc on load using the pre-filled values ---
-    window.addEventListener('load', () => {
-        // Trigger calculation for each row so derived columns and chart fill up
+    function fillAccurateData() {
+        const accurateData = [
+            { t: 70, i: 29.8 }, { t: 65, i: 20.9 }, { t: 60, i: 14.6 },
+            { t: 55, i: 10.0 }, { t: 50, i: 6.8 }, { t: 45, i: 4.6 },
+            { t: 40, i: 3.1 }, { t: 35, i: 2.0 }
+        ];
         let rows = document.querySelectorAll('#dataTable tbody tr');
-        rows.forEach(row => {
-            let inputs = row.querySelectorAll('input');
-            // call calculateRow using the first input element (current) to update its row
-            if (inputs[0]) calculateRow(inputs[0]);
+        accurateData.forEach((data, index) => {
+            if (rows[index]) {
+                let inputs = rows[index].querySelectorAll('input');
+                inputs[0].value = data.i; inputs[1].value = data.t;
+                calculateRow(inputs[0]);
+            }
         });
-    });
+    }
+
+    function clearData() {
+        let inputs = document.querySelectorAll('input');
+        inputs.forEach(input => input.value = '');
+        updateGraphAndResults();
+    }
 </script>
 
 </body>
