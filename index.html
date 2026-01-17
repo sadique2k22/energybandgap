@@ -3,59 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Energy Band Gap (With Save Feature)</title>
+    <title>Energy Band Gap (With Scale)</title>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
+	@media print {
+		.page-break {
+        break-before: page;
+      }
+    }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f4f4f9; }
         .container { background-color: white; padding: 40px; box-shadow: 0 0 15px rgba(0,0,0,0.1); border-radius: 8px; }
         h1 { text-align: center; color: #2c3e50; border-bottom: 2px solid #2c3e50; padding-bottom: 10px; }
         h2 { color: #2980b9; margin-top: 30px; border-left: 5px solid #2980b9; padding-left: 10px; }
+        h3 { color: #444; margin-top: 20px; }
         
-        .formula-box { background-color: #e8f4fd; padding: 15px; border-radius: 5px; border: 1px solid #b6d4fe; text-align: center; margin: 20px 0; }
+        .formula-box, .calc-box { background-color: #e8f4fd; padding: 15px; border-radius: 5px; border: 1px solid #b6d4fe; margin: 20px 0; }
+        .formula-box { text-align: center; }
+        .theory-box { background-color: #fffbf2; padding: 15px; border-radius: 5px; border: 1px solid #f0e6d2; margin: 20px 0; }
+        .derivation-box { background-color: #f9f9f9; padding: 15px; border-radius: 5px; border: 1px solid #ddd; margin: 20px 0; }
+        .obs-box { background-color: #f0fff4; padding: 15px; border-radius: 5px; border: 1px solid #b2f5ea; margin: 20px 0; }
+        
         .img-container { text-align: center; margin: 20px 0; padding: 10px; border: 1px dashed #ccc; }
         img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
         
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9em; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95em; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
         th { background-color: #2980b9; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
         
-        input[type="number"], input[type="text"] { width: 90%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
-        input[readonly] { background-color: #f0f0f0; color: #555; }
-        
-        /* Buttons */
-        .btn-container { text-align: center; margin-bottom: 20px; }
-        .magic-btn { background-color: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s; margin: 5px; }
-        .magic-btn:hover { background-color: #219150; }
-        .clear-btn { background-color: #c0392b; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
-        .save-btn { background-color: #2980b9; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px; }
-        .save-btn:hover { background-color: #1c6ea4; }
+        .procedure-list ol { padding-left: 20px; }
+        .procedure-list li { margin-bottom: 8px; color: #444; }
 
-        /* Graph Wrapper */
-        .chart-wrapper { 
-            position: relative; 
-            height: 600px; 
-            width: 100%; 
-            margin: 20px 0; 
-            border: 2px solid #2c3e50; 
+        .chart-container-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 2px solid #2c3e50;
             background-color: #fff;
+            display: flex;
+            justify-content: center;
         }
-        
-        .grid-controls {
+
+        .controls {
             background-color: #f1f1f1;
             padding: 10px;
             border-radius: 5px;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            justify-content: flex-end;
             margin-top: 10px;
             border: 1px solid #ddd;
         }
 
         .result-highlight { font-size: 1.2em; color: #d35400; font-weight: bold; }
-        .low-error { color: green; font-weight: bold; }
+        .calc-step { margin-bottom: 10px; font-family: 'Courier New', monospace; }
+        
+        .save-btn { background-color: #2980b9; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; }
+        .save-btn:hover { background-color: #1c6ea4; }
+
+        @media print {
+            body { 
+                background-color: white; 
+                padding: 0; 
+                margin: 0; 
+                font-size: 13pt; /* Slightly smaller text for print */
+            }
+            .container { 
+                box-shadow: none; 
+                padding: 0; 
+                width: 100%; 
+                max-width: 100%; 
+            }
+            /* Hide buttons when printing */
+            .controls, .save-btn, button { display: none !important; }
+            
+            /* Fix Graph Scaling */
+            .chart-container-wrapper {
+                border: 1px solid #000;
+                overflow: visible !important; /* No scrollbars */
+                display: block;
+                width: 100%;
+            }
+            /* Force canvas to fit width and maintain aspect ratio */
+            canvas {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+            
+            /* Ensure page breaks don't cut sections in half awkwardly */
+            h2 { page-break-before: auto; }
+            table { page-break-inside: avoid; }
+            .img-container { page-break-inside: avoid; }
+        }
     </style>
 </head>
 <body>
@@ -64,319 +105,416 @@
 
     <h1>Determination of Energy Band Gap</h1>
     
-    <div class="btn-container">
-        <button class="magic-btn" onclick="fillAccurateData()">✨ Auto-Fill Accurate Data (Ge)</button>
-        <button class="clear-btn" onclick="clearData()">❌ Clear Data</button>
-    </div>
-
     <h2>Object</h2>
     <p>To determine the band gap (\(\Delta E\)) of a semiconductor diode (Ge/Si) by studying the variation of reverse saturation current (\(I_s\)) with temperature.</p>
 
     <h2>Apparatus Required</h2>
-    <p>Power supply (3V DC), Micro-ammeter, Oven, Thermometer, Ge Diode, Wires.</p>
+    <p>Power supply (3V DC), Micro-ammeter, Oven, Thermometer, Ge Diode (OA79), Connecting Wires.</p>
 
     <h2>Formula Used</h2>
     <div class="formula-box">
         $$ \log I_s = \text{Constant} - 5.036\,\Delta E \left(\frac{10^3}{T}\right) $$
         <br>
         $$ \Delta E = \frac{\text{slope}}{5.036} \text{ eV} $$
+        
+        <div style="text-align: left; margin-top: 15px; font-size: 0.95em; line-height: 1.8;">
+            <strong>Where:</strong><br>
+            \( I_s \) = Reverse saturation current (in \(\mu A\))<br>
+            \( T \) = Absolute temperature (in Kelvin)<br>
+            \( \Delta E \) = Energy Band Gap (in eV)<br>
+            \( k \) = Boltzmann constant (\(8.617 \times 10^{-5} \text{ eV/K}\))
+        </div>
     </div>
+<div class="page-break"></div>
 
-    <h2>Figure 1</h2>
+    <h2>Theory</h2>
+    <div class="theory-box">
+        <p>
+            In solid-state physics, the energy band structure of a material determines its electrical conductivity. The electrons in an atom occupy specific energy levels, which form bands in a crystal lattice due to the close proximity of atoms. The range of energy levels that are completely filled with electrons at absolute zero temperature is known as the <strong>valence band</strong>. Electrons in this band are bound to the atoms and do not contribute to electric current.
+        </p>
+        <p>
+            Above the valence band lies the <strong>conduction band</strong>, which represents the range of energy levels where electrons are free to move throughout the crystal lattice. These electrons are responsible for conduction. Separating these two bands is a forbidden energy region where no electron states can exist. The energy difference between the top of the valence band and the bottom of the conduction band is called <strong>the Energy Band Gap (\( \Delta E \) or \( E_g \)) </strong>.
+        </p>
+        
+        <p>
+            For a semiconductor like Germanium (Ge), this gap is small enough that thermal energy can excite electrons from the valence band across the gap into the conduction band. As the temperature rises, the thermal vibrations of the crystal lattice increase, breaking more covalent bonds. This generates electron-hole pairs, where an electron moves to the conduction band and leaves behind a hole in the valence band.
+        </p>
+        <p>
+            In a p-n junction diode under reverse bias, the current that flows is called the reverse saturation current (\( I_s \)). This current is extremely sensitive to temperature because it depends entirely on these thermally generated minority carriers. The relationship is governed by the Boltzmann factor:
+        </p>
+        <p style="text-align: center;">$$ I_s \propto T^3 e^{-\frac{\Delta E}{kT}} $$</p>
+    </div>
+<div class="page-break"></div>
+
+    <h2>Derivation of Formula</h2>
+    <div class="derivation-box">
+        <p>The variation of reverse saturation current with temperature is given by:</p>
+        <p>$$ I_s = A T^3 e^{-\frac{\Delta E}{kT}} $$</p>
+        <p>Where \(A\) is a constant and \(k\) is Boltzmann's constant (\(8.617 \times 10^{-5} \text{ eV/K}\)).</p>
+        
+        <p>Taking the natural logarithm (\(\ln\)) on both sides:</p>
+        <p>$$ \ln I_s = \ln A + 3 \ln T - \frac{\Delta E}{kT} $$</p>
+        
+        <p>
+            Since the variation in the \( \ln T \) term is negligible compared to the exponential term over the small experimental temperature range, we can approximate the equation as:
+        </p>
+        <p>$$ \ln I_s \approx C - \frac{\Delta E}{kT} $$</p>
+        
+        <p>Converting natural log (\(\ln\)) to base 10 log (\(\log_{10}\)):</p>
+        <p>$$ 2.303 \log_{10} I_s = C - \frac{\Delta E}{kT} $$</p>
+        <p>$$ \log_{10} I_s = \text{Constant} - \frac{\Delta E}{2.303 \cdot k} \left(\frac{1}{T}\right) $$</p>
+        
+        <p>Comparing this with the equation of a straight line \( y = mx + c \), where \( y = \log I_s \) and \( x = \frac{10^3}{T} \):</p>
+        <p>$$ \text{Slope } (m) = \frac{\Delta E}{2.303 \cdot k \cdot 1000} $$</p>
+        
+        <p>Substituting the value of Boltzmann constant \( k \):</p>
+        <p>$$ \Delta E = \text{Slope} \times 2.303 \times 1000 \times 8.617 \times 10^{-5} $$</p>
+        <p>$$ \Delta E = \frac{\text{Slope}}{5.036} \text{ eV} $$</p>
+    </div>
+<div class="page-break"></div>
+
+    <h2>Procedure</h2>
+    <div class="procedure-list">
+        <ol>
+            <li>The circuit is connected with the p-n junction diode in reverse bias and a constant voltage of 3V is applied.</li>
+            <li>The diode is heated gradually in an oven, and the temperature is noted.</li>
+            <li>Corresponding values of reverse saturation current \(I_s\) are recorded using the micro-ammeter.</li>
+            <li>The procedure is repeated for different temperatures.</li>
+            <li>Temperature values are converted into Kelvin (\( K = ^\circ C + 273 \)).</li>
+            <li>Values of \(\log_{10} (I_s)\) and \(10^3/T\) are calculated for each reading.</li>
+            <li>A graph is plotted between \(\log_{10} I_s\) (Y-axis) and \(10^3/T\) (X-axis).</li>
+            <li>The slope of the straight-line portion of the graph is determined.</li>
+            <li>The energy band gap is calculated using the formula derived above.</li>
+        </ol>
+    </div>
+	
+<h2>Figure 1</h2>
     <div class="img-container">
         <img src="fig1.jpg" alt="Fig 1: Circuit Diagram" onerror="this.style.display='none'; this.parentElement.innerHTML+='<p style=\'color:red\'>[Image missing: Place fig1.jpg in folder]</p>'">
     </div>
+	<div class="page-break"></div>
+
+    <h2>Observations</h2>
+    <div class="obs-box">
+        <ul style="list-style-type: square; padding-left: 20px;">
+            <li><strong>Least count of Thermometer:</strong> 1°C</li>
+            <li><strong>Least count of Micro-ammeter:</strong> 2 \(\mu A\)</li>
+        </ul>
+    </div>
+
+    
 
     <h2>Table 1: Measurements</h2>
     <table id="dataTable">
         <thead>
             <tr>
                 <th>S.No</th>
-                <th>Current \(I_s\) (µA)</th>
                 <th>Temp (°C)</th>
+                <th>Current \(I_s\) (µA)</th>
                 <th>Temp (K)</th>
-                <th>\(10^3/T\)</th>
-                <th>\(\log I_s\)</th>
+                <th>\(10^3/T\) (K\(^{-1}\))<br>(\(X\))</th>
+                <th>\(\log I_s\)<br>(\(Y\))</th>
             </tr>
         </thead>
-        <tbody>
-            <tr><td>1</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
-            <tr><td>2</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
-            <tr><td>3</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
-            <tr><td>4</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
-            <tr><td>5</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
-            <tr><td>6</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
-            <tr><td>7</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
-            <tr><td>8</td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input type="number" step="0.1" oninput="calculateRow(this)"></td><td><input readonly></td><td><input readonly class="x-val"></td><td><input readonly class="y-val"></td></tr>
-        </tbody>
+        <tbody id="tableBody"></tbody>
     </table>
+<div class="page-break"></div>
 
     <h2>Graph: \(\log I_s\) vs \(10^3/T\)</h2>
     
-    <div class="chart-wrapper" id="graphContainer">
-        <canvas id="myChart"></canvas>
+    <div class="chart-container-wrapper">
+        <div style="position: relative; width: 100%; max-width: 800px;">
+            <canvas id="myChart"></canvas>
+        </div>
     </div>
 
-    <div class="grid-controls">
-        <div>
-            <label><strong>Grid Size:</strong></label>
-            <input type="number" id="gridInput" value="20" min="5" max="100" style="width: 60px;" oninput="updateGrid()"> px
-            <span style="color: #666; font-size: 0.9em; margin-left: 5px;">(10th=3px, 5th=2px, Rest=1px)</span>
-        </div>
+    <div class="controls">
         <button class="save-btn" onclick="saveGraph()">💾 Save Graph</button>
     </div>
+<div class="page-break"></div>
 
     <h2>Calculations & Result</h2>
-    <p><strong>Slope:</strong> <input type="text" id="slopeVal" readonly style="width: 100px; display:inline-block; font-weight:bold;"></p>
     
-    <div class="formula-box">
-        $$ \Delta E = \frac{\text{slope}}{5.036} $$
-        <span class="result-highlight">Calculated \(\Delta E\) = <span id="finalResult">---</span> eV</span>
-    </div>
+    <div class="calc-box">
+        <p><strong>1. Calculation of Slope:</strong></p>
+        <p>A right-angled triangle ABC is drawn on the straight line portion of the graph.</p>
+        <p><strong>Coordinates:</strong></p>
+        <p>Point A (\(x_2\) , \(y_2\)) : <strong>(2.9573,1.7782)</strong></p>
+        <p>Point C (\(x_1\) , \(y_1\)): <strong>(3.2452,0.9031)</strong></p>
+        <p>Point B (\(x_1\) , \(y_2\)): <strong>(3.2452, 1.7782)</strong></p>
+        
 
-    <h3>Percentage of Error</h3>
-    <p>Standard for Ge = 0.7 eV. Error: <span id="errorVal" style="font-size: 1.2em;">---</span></p>
+        <p class="calc-step">$$ \text{Height (AB)} = y_2 - y_1 = 1.7782 - 0.9031 = 0.8751 $$</p>
+        <p class="calc-step">$$ \text{Base (BC)} = x_1 - x_2 = 3.2452 - 2.9573 = 0.2879 $$</p>
+
+        <p class="calc-step">$$ \text{Slope} = \frac{\text{AB}}{\text{BC}} = \frac{0.8751}{0.2879} $$</p>
+        <p class="calc-step">$$ \text{Slope} = \mathbf{3.0396} K $$</p>
+        <p>Taking absolute magnitude: <strong>3.0396</strong></p>
+        <hr style="border-top: 1px dashed #ccc; margin: 20px 0;">
+
+        <p><strong>2. Calculation of Energy Band Gap (\(\Delta E\)):</strong></p>
+        <p class="calc-step">$$ \Delta E = \frac{\text{Slope}}{5.036} $$</p>
+        <p class="calc-step">$$ \Delta E = \frac{3.0396}{5.036} $$</p>
+        <p class="result-highlight">$$ \Delta E = 0.604 \text{ eV} $$</p>
+        
+        <hr style="border-top: 1px dashed #ccc; margin: 20px 0;">
+        <div class="page-break"></div>
+
+        <p><strong>3. Percentage Error:</strong></p>
+        <p>Standard Value for Germanium (Ge) = <strong>0.67 eV</strong></p>
+        <p class="calc-step">$$ \% \text{ Error} = \frac{|\text{Standard} - \text{Calculated}|}{\text{Standard}} \times 100 $$</p>
+        <p class="calc-step">$$ \% \text{ Error} = \frac{|0.67 - 0.604|}{0.67} \times 100 $$</p>
+        <p class="calc-step">$$ \% \text{ Error} = \frac{0.066}{0.67} \times 100 $$</p>
+        <p class="result-highlight">$$ \% \text{ Error} = 9.91 \% $$</p>
+    </div>
 
     <hr>
     
     <h2>Precautions</h2>
     <ul>
+		<li>The diode must be reverse biased.</li>
         <li>Maximum temperature should not exceed 80°C.</li>
         <li>Avoid parallax errors in thermometer readings.</li>
-        <li>Ensure steady heating/cooling.</li>
+        <li>Bulb of thermometer should be inserted well in the oven.</li>
+		<li>Readings of current and temperature must be taken simultaneously. </li>
     </ul>
 
     <h2>References</h2>
     <ul>
-        <li>Practical Physics Manual</li>
-        <li>Semiconductor Physics Notes</li>
+        <li>Practical Physics Manual by Dr. SL Gupta and Dr. V Kumar, PP: 144EN - 146EN</li>
     </ul>
 </div>
 
 <script>
-    // --- Graph Initialization ---
+    // --- 1. DATA ---
+    const rawData = [
+        { t: 65, i: 60 }, { t: 60, i: 42 }, { t: 55, i: 30 }, { t: 50, i: 22 },
+        { t: 45, i: 16 }, { t: 40, i: 12 }, { t: 35, i: 8 },  { t: 30, i: 6 }
+    ];
+
+    let processedData = [];
+    const tableBody = document.getElementById('tableBody');
+
+    rawData.forEach((row, index) => {
+        let tempK = row.t + 273.15;
+        let xVal = 1000 / tempK;
+        let yVal = Math.log10(row.i);
+        processedData.push({ x: xVal, y: yVal });
+
+        let tr = document.createElement('tr');
+        tr.innerHTML = `<td>${index + 1}</td><td>${row.t}</td><td>${row.i}</td>
+                        <td>${tempK.toFixed(1)}</td><td>${xVal.toFixed(4)}</td><td>${yVal.toFixed(4)}</td>`;
+        tableBody.appendChild(tr);
+    });
+
+    // Points for calculation
+    const p1 = processedData[0]; // Point 1 (65C)
+    const p2 = processedData[6]; // Point 7 (35C)
+
+    // --- 2. GRID PLUGIN ---
+    const gridPlugin = {
+        id: 'millimeterGrid',
+        beforeDraw: (chart) => {
+            const { ctx, chartArea: { left, top, right, bottom }, scales: { x, y } } = chart;
+            ctx.save();
+            ctx.beginPath();
+            
+            function drawLine(x1, y1, x2, y2, width, color) {
+                ctx.lineWidth = width;
+                ctx.strokeStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+            }
+
+            const gridColor = 'rgba(0, 100, 0, 0.25)';
+            const xStart = 2.90; const xEnd = 3.35; const smallStepX = 0.005; 
+            for (let val = xStart; val <= xEnd + 0.0001; val += smallStepX) {
+                const xPos = x.getPixelForValue(val);
+                if (xPos < left || xPos > right) continue;
+                let index = Math.round((val - xStart) / smallStepX);
+                if (index % 10 === 0) drawLine(xPos, top, xPos, bottom, 2, 'rgba(0, 100, 0, 0.4)');
+                else if (index % 5 === 0) drawLine(xPos, top, xPos, bottom, 1.5, gridColor);
+                else drawLine(xPos, top, xPos, bottom, 0.5, 'rgba(0, 100, 0, 0.15)');
+            }
+
+            const yStart = 0.60; const yEnd = 2.00; const smallStepY = 0.02;
+            for (let val = yStart; val <= yEnd + 0.0001; val += smallStepY) {
+                const yPos = y.getPixelForValue(val);
+                if (yPos > bottom || yPos < top) continue;
+                let index = Math.round((val - yStart) / smallStepY);
+                if (index % 10 === 0) drawLine(left, yPos, right, yPos, 2, 'rgba(0, 100, 0, 0.4)');
+                else if (index % 5 === 0) drawLine(left, yPos, right, yPos, 1.5, gridColor);
+                else drawLine(left, yPos, right, yPos, 0.5, 'rgba(0, 100, 0, 0.15)');
+            }
+            ctx.restore();
+        }
+    };
+
+    // --- 3. TRIANGLE & LABELS PLUGIN ---
+    const trianglePlugin = {
+        id: 'triangleDraw',
+        afterDatasetsDraw: (chart) => {
+            const { ctx, scales: { x, y } } = chart;
+            
+            // Calc coordinates
+            const Ax = x.getPixelForValue(p1.x); // x1
+            const Ay = y.getPixelForValue(p1.y); // y1 (Top)
+            
+            const Cx = x.getPixelForValue(p2.x); // x2
+            const Cy = y.getPixelForValue(p2.y); // y2 (Bottom)
+            
+            // For vertical height AB, B must have same X as A, same Y as C?
+            // User requested Height AB and Base BC.
+            // If AB is Height, it is vertical. 
+            // A = (x1, y1), B = (x1, y2), C = (x2, y2). This makes AB vertical and BC horizontal.
+            // A (Top Left), B (Bottom Left), C (Bottom Right).
+            
+            const Bx = Ax;
+            const By = Cy;
+
+            ctx.save();
+            ctx.setLineDash([5, 5]);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#333';
+
+            // Draw Height AB (Vertical)
+            ctx.beginPath();
+            ctx.moveTo(Ax, Ay);
+            ctx.lineTo(Bx, By);
+            ctx.stroke();
+
+            // Draw Base BC (Horizontal)
+            ctx.beginPath();
+            ctx.moveTo(Bx, By);
+            ctx.lineTo(Cx, Cy);
+            ctx.stroke();
+
+            // Labels
+            ctx.font = 'bold 14px Arial';
+            ctx.fillStyle = 'black';
+            ctx.textAlign = 'right';
+            ctx.fillText('A', Ax - 8, Ay);
+            ctx.textAlign = 'right';
+            ctx.fillText('B', Bx - 8, By); 
+            ctx.textAlign = 'left';
+            ctx.fillText('C', Cx + 8, Cy); 
+            
+            // Coordinate Values
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#444';
+            ctx.setLineDash([]);
+            // Label A
+            ctx.fillText(`(${p1.x.toFixed(4)}, ${p1.y.toFixed(4)})`, Ax + 5, Ay + 5);
+            // Label C
+            ctx.fillText(`(${p2.x.toFixed(4)}, ${p2.y.toFixed(4)})`, Cx - 110, Cy - 5);
+
+            ctx.restore();
+        }
+    };
+
+    // --- 4. SCALE LEGEND PLUGIN (NEW) ---
+    const scaleLegendPlugin = {
+        id: 'scaleLegend',
+        afterDraw: (chart) => {
+            const { ctx, chartArea: { top, right } } = chart;
+            
+            ctx.save();
+            // Box settings
+            const width = 160;
+            const height = 55;
+            const padding = 10;
+            const x = right - width;
+            const y = top + padding;
+
+            // Draw Box Background
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(x, y, width, height);
+            
+            // Draw Box Border
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#000';
+            ctx.strokeRect(x, y, width, height);
+
+            // Draw Text
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            
+            ctx.fillText('Scale:', x + 10, y + 8);
+            ctx.font = '12px Arial';
+            ctx.fillText('X-axis: 10 div = 0.05 K⁻¹', x + 10, y + 24);
+            ctx.fillText('Y-axis: 10 div = 0.2 units', x + 10, y + 38);
+
+            ctx.restore();
+        }
+    };
+
+    // --- 5. CHART SETUP ---
     let ctx = document.getElementById('myChart').getContext('2d');
     let myChart = new Chart(ctx, {
         type: 'scatter',
         data: {
             datasets: [{
                 label: 'Readings',
-                data: [],
+                data: processedData,
                 backgroundColor: 'blue',
-                pointRadius: 6,
-                pointHoverRadius: 8
+                pointRadius: 6
             }, {
                 label: 'Best Fit Line',
-                data: [],
+                data: [
+                    { x: 2.90, y: p1.y + ((p2.y - p1.y)/(p2.x - p1.x)) * (2.90 - p1.x) },
+                    { x: 3.35, y: p2.y + ((p2.y - p1.y)/(p2.x - p1.x)) * (3.35 - p2.x) }
+                ],
                 type: 'line',
                 borderColor: 'red',
-                borderWidth: 3,
-                pointRadius: 0,
-                fill: false,
-                tension: 0
+                borderWidth: 2,
+                pointRadius: 0
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: { labels: { font: { size: 14 } } }
-            },
+            plugins: { legend: { labels: { font: { size: 14 } } } },
             scales: {
                 x: { 
                     title: { display: true, text: '10³/T (K⁻¹)', font: {size: 16, weight: 'bold'} },
+                    type: 'linear', min: 2.90, max: 3.35,
+                    ticks: { stepSize: 0.05, font: { weight: 'bold' } },
                     grid: { display: false } 
                 },
                 y: { 
                     title: { display: true, text: 'log Is', font: {size: 16, weight: 'bold'} },
-                    grid: { display: false } 
+                    type: 'linear', min: 0.60, max: 2.00,
+                    ticks: { stepSize: 0.2, font: { weight: 'bold' }, callback: function(v) { return v.toFixed(1); } },
+                    grid: { display: false }
                 }
             }
-        }
+        },
+        plugins: [gridPlugin, trianglePlugin, scaleLegendPlugin] // Added scaleLegendPlugin
     });
 
-    // --- Dynamic Grid Logic ---
-    function updateGrid() {
-        let size = document.getElementById('gridInput').value;
-        let container = document.getElementById('graphContainer');
-        let color = 'rgba(0, 100, 0, 0.2)'; 
-
-        if(size < 5) size = 5;
-
-        // Layer 1: Every 10th line (3px thick)
-        let layer1 = `linear-gradient(to right, ${color} 3px, transparent 3px), linear-gradient(to bottom, ${color} 3px, transparent 3px)`;
-        let size1 = `${size * 10}px ${size * 10}px`;
-
-        // Layer 2: Every 5th line (2px thick)
-        let layer2 = `linear-gradient(to right, ${color} 2px, transparent 2px), linear-gradient(to bottom, ${color} 2px, transparent 2px)`;
-        let size2 = `${size * 5}px ${size * 5}px`;
-
-        // Layer 3: Every 1st line (1px thick)
-        let layer3 = `linear-gradient(to right, ${color} 1px, transparent 1px), linear-gradient(to bottom, ${color} 1px, transparent 1px)`;
-        let size3 = `${size}px ${size}px`;
-
-        container.style.backgroundImage = `${layer1}, ${layer2}, ${layer3}`;
-        container.style.backgroundSize = `${size1}, ${size2}, ${size3}`;
+    // --- 6. SQUARE GRID LOGIC ---
+    function forceSquareGrid() {
+        const chartCanvas = document.getElementById('myChart');
+        const width = chartCanvas.parentElement.clientWidth;
+        const xRange = 3.35 - 2.90; 
+        const yRange = 2.00 - 0.60; 
+        const pureGridRatio = (yRange / xRange) * (0.05 / 0.2); 
+        chartCanvas.style.height = (width * pureGridRatio + 80) + 'px';
+        myChart.resize();
     }
+    window.addEventListener('resize', forceSquareGrid);
+    setTimeout(forceSquareGrid, 100);
 
-    // Initialize grid
-    updateGrid();
-
-    // --- Save Graph Function ---
+    // --- 7. SAVE FUNCTION ---
     function saveGraph() {
-        // 1. Get the original chart canvas
-        const originalCanvas = document.getElementById('myChart');
-        const container = document.getElementById('graphContainer');
-        const width = originalCanvas.width;
-        const height = originalCanvas.height;
-
-        // 2. Create a temporary canvas to combine grid + chart
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = width;
-        tempCanvas.height = height;
-        const tempCtx = tempCanvas.getContext('2d');
-
-        // 3. Draw White Background
-        tempCtx.fillStyle = '#ffffff';
-        tempCtx.fillRect(0, 0, width, height);
-
-        // 4. Draw Grid Pattern Manually (since CSS background won't auto-save)
-        // We need to fetch the computed style to match the user's grid size
-        let gridSize = parseInt(document.getElementById('gridInput').value);
-        if(!gridSize) gridSize = 20;
-
-        // Helper to draw grid lines
-        function drawGridLines(step, lineWidth, color) {
-            tempCtx.beginPath();
-            tempCtx.lineWidth = lineWidth;
-            tempCtx.strokeStyle = color;
-
-            // Vertical lines
-            for (let x = 0; x <= width; x += step) {
-                tempCtx.moveTo(x, 0);
-                tempCtx.lineTo(x, height);
-            }
-            // Horizontal lines
-            for (let y = 0; y <= height; y += step) {
-                tempCtx.moveTo(0, y);
-                tempCtx.lineTo(width, y);
-            }
-            tempCtx.stroke();
-        }
-
-        const gridColor = 'rgba(0, 100, 0, 0.2)';
-        
-        // Draw layers (largest step first to be at bottom, but transparency makes order less critical)
-        // However, standard canvas draws on top. We want small lines, then medium, then thick.
-        
-        // 1px lines (Every single grid)
-        drawGridLines(gridSize, 1, gridColor);
-        // 2px lines (Every 5th)
-        drawGridLines(gridSize * 5, 2, gridColor);
-        // 3px lines (Every 10th)
-        drawGridLines(gridSize * 10, 3, gridColor);
-
-        // 5. Draw the Chart.js content on top
-        tempCtx.drawImage(originalCanvas, 0, 0);
-
-        // 6. Trigger Download
         const link = document.createElement('a');
-        link.download = 'BandGap_Graph.png';
-        link.href = tempCanvas.toDataURL('image/png');
+        link.download = 'BandGap_Final.png';
+        link.href = document.getElementById('myChart').toDataURL('image/png', 1.0);
         link.click();
-    }
-
-    // --- Calculation Logic ---
-    function calculateRow(inputElement) {
-        let row = inputElement.parentElement.parentElement;
-        let inputs = row.querySelectorAll('input');
-        
-        let currentIs = parseFloat(inputs[0].value);
-        let tempC = parseFloat(inputs[1].value);
-
-        if (!isNaN(currentIs) && !isNaN(tempC) && currentIs > 0) {
-            let tempK = tempC + 273.15;
-            let xVal = 1000 / tempK;       
-            let yVal = Math.log10(currentIs); 
-
-            inputs[2].value = tempK.toFixed(1);
-            inputs[3].value = xVal.toFixed(4);
-            inputs[4].value = yVal.toFixed(4);
-        } else {
-            inputs[2].value = ''; inputs[3].value = ''; inputs[4].value = '';
-        }
-        updateGraphAndResults();
-    }
-
-    function updateGraphAndResults() {
-        let xData = [], yData = [];
-        let rows = document.querySelectorAll('#dataTable tbody tr');
-        rows.forEach(row => {
-            let inputs = row.querySelectorAll('input');
-            let x = parseFloat(inputs[3].value);
-            let y = parseFloat(inputs[4].value);
-            if (!isNaN(x) && !isNaN(y)) { xData.push(x); yData.push(y); }
-        });
-
-        myChart.data.datasets[0].data = xData.map((x, i) => ({x: x, y: yData[i]}));
-
-        if (xData.length >= 2) {
-            let n = xData.length;
-            let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
-            for (let i = 0; i < n; i++) {
-                sumX += xData[i]; sumY += yData[i];
-                sumXY += xData[i] * yData[i]; sumXX += xData[i] * xData[i];
-            }
-            let slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
-            let intercept = (sumY - slope * sumX) / n;
-
-            let minX = Math.min(...xData) - 0.1;
-            let maxX = Math.max(...xData) + 0.1;
-            
-            myChart.data.datasets[1].data = [
-                {x: minX, y: slope * minX + intercept},
-                {x: maxX, y: slope * maxX + intercept}
-            ];
-
-            let absSlope = Math.abs(slope);
-            document.getElementById('slopeVal').value = absSlope.toFixed(4);
-            let deltaE = absSlope / 5.036;
-            document.getElementById('finalResult').innerText = deltaE.toFixed(3);
-            
-            let error = ((Math.abs(deltaE - 0.7) / 0.7) * 100).toFixed(2);
-            let errorSpan = document.getElementById('errorVal');
-            errorSpan.innerText = error + " %";
-            errorSpan.className = error < 5 ? 'low-error' : 'high-error';
-            if(error < 5) errorSpan.innerText += " (Excellent)";
-        } else {
-            myChart.data.datasets[1].data = [];
-            document.getElementById('slopeVal').value = "";
-            document.getElementById('finalResult').innerText = "---";
-            document.getElementById('errorVal').innerText = "---";
-        }
-        myChart.update();
-    }
-
-    function fillAccurateData() {
-        const accurateData = [
-            { t: 70, i: 29.8 }, { t: 65, i: 20.9 }, { t: 60, i: 14.6 },
-            { t: 55, i: 10.0 }, { t: 50, i: 6.8 }, { t: 45, i: 4.6 },
-            { t: 40, i: 3.1 }, { t: 35, i: 2.0 }
-        ];
-        let rows = document.querySelectorAll('#dataTable tbody tr');
-        accurateData.forEach((data, index) => {
-            if (rows[index]) {
-                let inputs = rows[index].querySelectorAll('input');
-                inputs[0].value = data.i; inputs[1].value = data.t;
-                calculateRow(inputs[0]);
-            }
-        });
-    }
-
-    function clearData() {
-        let inputs = document.querySelectorAll('input');
-        inputs.forEach(input => input.value = '');
-        updateGraphAndResults();
     }
 </script>
 
